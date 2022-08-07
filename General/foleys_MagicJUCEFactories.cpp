@@ -675,10 +675,12 @@ class KeyboardItem : public GuiItem
 {
 public:
     FOLEYS_DECLARE_GUI_FACTORY (KeyboardItem)
+    static const juce::Identifier  orientation;
+    static const juce::StringArray orientationTypes;
 
     KeyboardItem (MagicGUIBuilder& builder, const juce::ValueTree& node)
       : GuiItem (builder, node),
-        keyboard (getMagicState().getKeyboardState(), juce::MidiKeyboardComponent::horizontalKeyboard)
+        keyboard (getMagicState().getKeyboardState(), juce::MidiKeyboardComponent::verticalKeyboardFacingRight)
     {
         setColourTranslation (
         {
@@ -697,13 +699,22 @@ public:
         auto size = getProperty ("key-width");
         keyboard.setKeyWidth (size.isVoid() ? 50.0f : float (size));
 
-        auto orientation = getProperty ("orientation").toString();
-        if (orientation == "vertical-left")
+        auto orientationVal = getProperty (orientation).toString();
+        if (orientationVal == "vertical-left")
             keyboard.setOrientation (juce::MidiKeyboardComponent::verticalKeyboardFacingLeft);
-        else if (orientation == "vertical-right")
+        else if (orientationVal == "vertical-right")
             keyboard.setOrientation (juce::MidiKeyboardComponent::verticalKeyboardFacingRight);
         else
             keyboard.setOrientation (juce::MidiKeyboardComponent::horizontalKeyboard);
+    }
+
+    std::vector<SettableProperty> getSettableProperties() const override
+    {
+        std::vector<SettableProperty> props;
+
+        props.push_back ({ configNode, orientation, SettableProperty::Choice, {}, magicBuilder.createChoicesMenuLambda (orientationTypes) });
+
+        return props;
     }
 
     juce::Component* getWrappedComponent() override
@@ -717,6 +728,8 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (KeyboardItem)
 };
 
+const juce::Identifier  KeyboardItem::orientation     { "orientation" };
+const juce::StringArray KeyboardItem::orientationTypes { "vertical-left", "vertical-right", "horizontal" };
 //==============================================================================
 
 class DrumpadItem : public GuiItem
