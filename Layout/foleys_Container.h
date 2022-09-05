@@ -161,6 +161,7 @@ private:
 
     int  currentTab = 0;
     int  refreshRateHz = 30;
+    juce::String onTabChange = "";
 
     LayoutType    layout = LayoutType::FlexBox;
     juce::FlexBox flexBox;

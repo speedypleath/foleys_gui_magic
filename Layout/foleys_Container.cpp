@@ -76,6 +76,11 @@ void Container::update()
         updateContinuousRedraw();
     }
 
+    auto tabChange = magicBuilder.getStyleProperty(IDs::tabChange, configNode).toString();
+    if (tabChange.isNotEmpty()) {
+        onTabChange = tabChange;
+    }
+
     auto scroll = magicBuilder.getStyleProperty (IDs::scrollMode, configNode).toString();
     if (scroll.isNotEmpty())
     {
@@ -341,6 +346,8 @@ void Container::timerCallback()
 void Container::changeListenerCallback (juce::ChangeBroadcaster*)
 {
     currentTab = tabbedButtons ? tabbedButtons->getCurrentTabIndex() : 0;
+    if(onTabChange.isNotEmpty())
+        getMagicState().getSettings().setProperty(onTabChange, tabbedButtons->getCurrentTabName(), nullptr);
     updateSelectedTab();
 }
 
